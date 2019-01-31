@@ -40,13 +40,20 @@ class Serializer:
 class Deserializer:
 	def __init__(self, serializer):
 		input_counter, count_b_input = self.calc_var_int(8, serializer)
-		
 		self.ret = {
 			'Version' : struct.unpack("<I", binascii.unhexlify(serializer[:8]))[0],
 			'Input Count' : input_counter
 		}
 		
-		self.deserialize_input(input_counter, count_b_input, serializer)
+		inputs, serializer = self.deserialize_input(input_counter, count_b_input, serializer)
+		self.ret['Inputs'] = inputs
+
+		output_counter, count_b_output = self.calc_var_int(0, serializer)
+		self.ret['Output Count'] = output_counter
+		
+		outputs, serializer = self.deserialize_output(output_counter, count_b_output, serializer)
+		self.ret['Outputs'] = outputs
+		self.ret['Locktime'] = struct.unpack("<I", binascii.unhexlify(serializer))[0]	
 
 	def calc_var_int(self, index, serializer):
 		var_int = -1
@@ -79,13 +86,33 @@ class Deserializer:
 			serial = serial[(72 + count_byte) : ]
 			d_input['ScriptSig Size'] = hex(var_int)[2:]
 			d_input['ScriptSig'] = serial[: (var_int * 2)]
-			serial = serial[(var_int) * 2 :]
+			serial = serial[(var_int * 2) :]
 			d_input['Sequence'] = struct.unpack('<I', binascii.unhexlify(serial[:8]))[0]
 			serial = serial[8:]	
 			input_counter -= 1
 			inputs.append(d_input)
 		#print(inputs)
-		return inputs
+		return inputs, serial
+
+	def deserialize_output(self, output_counter, count_b_output, serializer):
+		serial = serializer[count_b_output :]
+		outputs = []
+	
+		while output_counter > 0:
+			d_output = {}
+			d_output['Value'] = struct.unpack('<Q', binascii.unhexlify(serial[:16]))[0]
+			
+			var_int, count_byte = self.calc_var_int(16, serial)
+			serial = serial[(16 + count_byte) : ]
+			d_output['ScriptPubKey Size'] = hex(var_int)[2:]
+			d_output['ScriptPubKey'] = serial[: (var_int * 2)]
+			serial = serial[(var_int * 2) :]
+			
+			output_counter -= 1
+			outputs.append(d_output)
+		
+		#print(outputs)
+		return outputs, serial
 
 	def get_deserializer(self):
 		return self.ret
