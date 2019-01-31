@@ -4,9 +4,9 @@ import struct
 class Serializer:
 	def __init__(self, tx):
 		self.serial = struct.pack('<I', tx.version).hex()
-		self.serial = self.serial + struct.pack('H', tx.get_input_counter()).hex()
+		self.serial = self.serial + struct.pack('B', tx.get_input_counter()).hex()
 		self.serial = self.serial + self.serialize_input(tx.inputs.copy())
-		self.serial = self.serial + struct.pack('H', tx.get_output_counter()).hex()
+		self.serial = self.serial + struct.pack('B', tx.get_output_counter()).hex()
 		self.serial = self.serial + self.serialize_output(tx.outputs.copy())
 		self.serial = self.serial + struct.pack('<I', tx.locktime).hex()
 
@@ -118,6 +118,5 @@ class Deserializer:
 		return self.ret
 
 
-deser = Deserializer("01000000017967a5185e907a25225574544c31f7b059c1a191d65b53dcc1554d339c4f9efc010000006a47304402206a2eb16b7b92051d0fa38c133e67684ed064effada1d7f925c842da401d4f22702201f196b10e6e4b4a9fff948e5c5d71ec5da53e90529c8dbd122bff2b1d21dc8a90121039b7bcd0824b9a9164f7ba098408e63e5b7e3cf90835cceb19868f54f8961a825ffffffff014baf2100000000001976a914db4d1141d0048b1ed15839d0b7a4c488cd368b0e88ac00000000")
-
-print(deser.get_deserializer())
+#deser = Deserializer("01000000018190374a5a1feb54fab4417fac1a3d9185de06fd8dcac34822c7cd00083638b1000000006b483045022100b73d2ef337b0733c99ddd0c66a361ab003fc628a4a8667f7b36024e15f00974402203ea2712c0d764aa79cd283e65e5385d5da4b6b35e2b06548e2cd208bc3571d8b012103c13dca192f1ba64265d8efca97d43b822ff24db357c13b0e6e0395cf91e9efaeffffffff0250da1100000000001976a9140964c6feb963ade6836e722670abbc0147ca5cec88ac00e20400000000001976a914977ae6e32349b99b72196cb62b5ef37329ed81b488ac00000000")
+#print(deser.get_deserializer())

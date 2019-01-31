@@ -9,7 +9,7 @@ class Input:
 		self.prev_txid = prev_txid
 		self.prev_index = prev_index
 		self.sequence = 4294967294
-		self.script_hex = signature + pubkey
+		self.script_hex = hex(len(binascii.unhexlify(signature)))[2:] + signature + "01" + hex(len(binascii.unhexlify(pubkey)))[2:] + pubkey
 		self.length_script = len(binascii.unhexlify(self.script_hex))
 		
 	def set_sequense(sequense):
@@ -70,7 +70,7 @@ class CoinbaseTransaction(Transaction):
 		super().__init__("0"*34, recipient, 50)
 
 transaction = Transaction(0)
-transaction.add_input("84f3fa278d3097e8572729fc3a73d7a810282f63e8865f4c9114243894f427d9", 1, "1600148ed2231a28bdde", "898dde4e83250a4bb33b1c5ac5")
+transaction.add_input("ceb7b8458419da7fa406da5d63b19b5306a2afc8", 1, "84f3fa278d3097e8572729fc3a73d7a810282f63e8865f4c9114243894f427d9", "2ef50fbcd0b8d433bab7a77bdb99607dd8dfe0f5")
 transaction.add_output(10000, "ceb7b8458419da7fa406da5d63b19b5306a2afc8")
 transaction.add_output(123123, "2ef50fbcd0b8d433bab7a77bdb99607dd8dfe0f5")
 
