@@ -2,13 +2,14 @@ import hashlib
 import wallet
 import binascii
 
+from serializer import Serializer
+
 class Input:
 	def __init__(self, prev_txid, prev_index, signature, pubkey):
 		self.prev_txid = prev_txid
 		self.prev_index = prev_index
-		self.sequense = 4294967294
-		self.script = signature + " " + pubkey
-		self.script_hex
+		self.sequence = 4294967294
+		self.script_hex = signature + pubkey
 		self.length_script = len(binascii.unhexlify(self.script_hex))
 		
 	def set_sequense(sequense):
@@ -17,7 +18,9 @@ class Input:
 class Output:
 	def __init__(self, amount, hash_pubkey):
 		self.value = amount
-		self.script = "OP_DUP OP_HASH160 " + hash_bubkey + " OP_EQUALVERIFY OP_CHECKSIG"
+		self.script_hex = "76a9" + hash_pubkey + "88ac"
+		self.script = "OP_DUP OP_HASH160 " + hash_pubkey + " OP_EQUALVERIFY OP_CHECKSIG"
+		self.length_script = len(binascii.unhexlify(self.script_hex))
 
 class Transaction:
 	def __init__(self, locktime):
@@ -30,16 +33,16 @@ class Transaction:
 		self.locktime = locktime
 
 	def add_input(self, prev_txid, prev_index, signature, pubkey):
-		self.inputs.append(Input(prev_txid, prev_index))
+		self.inputs.append(Input(prev_txid, prev_index, signature, pubkey))
 
 	def get_input_counter(self):
-		return len(inputs)
+		return len(self.inputs)
 
-	def add_ouput(self, amount, hash_pubkey):
-		self.ouputs.append(Output(amount, hash_pubkey))
+	def add_output(self, amount, hash_pubkey):
+		self.outputs.append(Output(amount, hash_pubkey))
 		
 	def get_output_counter(self):
-		return len(outputs)
+		return len(self.outputs)
 
 	#def set_locktime(self, locktime):
 	#	self.locktime = locktime
@@ -66,3 +69,10 @@ class CoinbaseTransaction(Transaction):
 		f.close()
 		super().__init__("0"*34, recipient, 50)
 
+transaction = Transaction(0)
+transaction.add_input("84f3fa278d3097e8572729fc3a73d7a810282f63e8865f4c9114243894f427d9", 1, "1600148ed2231a28bdde", "898dde4e83250a4bb33b1c5ac5")
+transaction.add_output(10000, "ceb7b8458419da7fa406da5d63b19b5306a2afc8")
+transaction.add_output(123123, "2ef50fbcd0b8d433bab7a77bdb99607dd8dfe0f5")
+
+serializer = Serializer(transaction)
+print(serializer.get_serializer())

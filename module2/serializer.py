@@ -4,10 +4,13 @@ import struct
 class Serializer:
 	def __init__(self, tx):
 		self.serial = struct.pack('<I', tx.version).hex()
-		self.serial = self.serial + struct.pack('H', tx.get_input_counter).hex()
-		self.serial = self.serial + struct.pack(
+		self.serial = self.serial + struct.pack('H', tx.get_input_counter()).hex()
+		self.serial = self.serial + self.serialize_input(tx.inputs.copy())
+		self.serial = self.serial + struct.pack('H', tx.get_output_counter()).hex()
+		self.serial = self.serial + self.serialize_output(tx.outputs.copy())
+		self.serial = self.serial + struct.pack('<I', tx.locktime).hex()
 
-	def serialize_input(inputs):
+	def serialize_input(self, inputs):
 		serial = ""
 		for i in inputs:
 			serial = serial + binascii.unhexlify(i.prev_txid)[::-1].hex()
@@ -15,6 +18,15 @@ class Serializer:
 			serial = serial + hex(i.length_script)[2:]
 			serial = serial + i.script_hex
 			serial = serial + struct.pack('<I', i.sequence).hex()
+		return serial
+
+	def serialize_output(self, outputs):
+		serial = ""
+		for i in outputs:
+			serial = serial + struct.pack('<Q', i.value).hex()
+			serial = serial + hex(i.length_script)[2:]
+			serial = serial + i.script_hex
+		return serial
 	#def __init__(self, tx):
 	#	self.serial = (4 - len(hex(tx.amount)[2:])) * '0' + hex(tx.amount)[2:]
 	#	self.serial = self.serial + (35 - len(tx.sender)) * '0' + tx.sender
