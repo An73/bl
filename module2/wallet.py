@@ -62,7 +62,7 @@ def get_address(privkey):
 	#print("4--> " + address)
 	first = hashlib.sha256(binascii.unhexlify(address)).hexdigest()
 	#print("5--> " + first)
-	first = hashlib.sha256(binascii.unhexlify(first)).hexdigest()
+	first = hashlib.ripemd160(binascii.unhexlify(first)).hexdigest()
 	#print("6--> " + first)
 	first = bytes.fromhex(first)[0:4].hex()
 	address = address + first
@@ -81,4 +81,4 @@ def sign(privkey, message):
 	return (signature, public)
 
 #sign("d7e878dcc3c8b3eee676b58848450a64b48fa6dc04d2aba5eb7808b5a8196463", "adsada")
-	
+
