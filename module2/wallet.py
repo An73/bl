@@ -5,6 +5,19 @@ import ecdsa
 import os
 import secrets
 
+def GetPubKey(pubkey, compressed=False):
+	if compressed:
+		if pubkey.point.y() & 1:
+			key = '03' + '%064x' % pubkey.point.x()
+		else:
+			key = '02' + '%064x' % pubkey.point.x()
+	else:
+		key = '04' + \
+		'%064x' % pubkey.point.x() + \
+		'%064x' % pubkey.point.y()
+
+	return key	
+
 def privkey_to_wif():
 	f = open('privkey')
 	privkey = f.read().splitlines()[0]
@@ -48,11 +61,25 @@ def wif_to_private_key(wif):
 	return "0"
 
 def get_public_key(privkey):
-	public = (ecdsa.SigningKey.from_string(privkey, curve=ecdsa.SECP256k1)).get_verifying_key()
+	private = ecdsa.SigningKey.from_string(privkey, curve=ecdsa.SECP256k1)
+	public = private.get_verifying_key()
+	#K_compressed = GetPubKey(public.pubkey, True)
 	return "04" + public.to_string().hex()
 
+def public_to_compressed(pubkey):
+	pubkey = binascii.unhexlify(pubkey[2:])
+	pubkey = pubkey[: int(len(pubkey) / 2)]
+	if pubkey[-1] % 2:
+		pubkey = b'\x03' + pubkey
+	else:
+		pubkey = b'\x02' + pubkey
+	return pubkey.hex()
+	
+
 def get_address(privkey):
+	#privkey=binascii.unhexlify("18e14a7b6a307f426a94f8114701e7c8e774e7f9a47e2c2035db29a206321725")
 	public = get_public_key(privkey)
+	public = public_to_compressed(public)
 	#print("1--> " + public)
 	address = hashlib.sha256(binascii.unhexlify(public)).hexdigest()
 	#print("2--> " + address)
@@ -62,7 +89,7 @@ def get_address(privkey):
 	#print("4--> " + address)
 	first = hashlib.sha256(binascii.unhexlify(address)).hexdigest()
 	#print("5--> " + first)
-	first = hashlib.ripemd160(binascii.unhexlify(first)).hexdigest()
+	first = hashlib.sha256(binascii.unhexlify(first)).hexdigest()
 	#print("6--> " + first)
 	first = bytes.fromhex(first)[0:4].hex()
 	address = address + first
@@ -76,9 +103,8 @@ def sign(privkey, message):
 		singing_key = ecdsa.SigningKey.from_string(binascii.unhexlify(privkey), curve=ecdsa.SECP256k1, hashfunc=hashlib.sha256)
 	except:
 		return (-1, -1)
-	signature = singing_key.sign(message.encode('utf-8'), hashfunc=hashlib.sha256, sigencode=ecdsa.util.sigencode_der)
+	signature = singing_key.sign(message.encode('utf-8'), hashfunc=hashlib.sha256)
 	public = get_public_key(binascii.unhexlify(privkey))
 	return (signature, public)
 
-#sign("d7e878dcc3c8b3eee676b58848450a64b48fa6dc04d2aba5eb7808b5a8196463", "adsada")
-
+#print(get_address("123"))
