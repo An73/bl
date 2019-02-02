@@ -28,10 +28,9 @@ import base58check
 #print(hex(script_len)[2:])
 #print(script_hex)
 
+#TEST
 check_address = base58check.b58decode(bytes("1BDmLvhKiqLwCkktnMPf3R8VBTma25Qmzv", "utf-8"))
 check_address = check_address[1:-4].hex()
-#check_address = hashlib.sha256(binascii.unhexlify(check_address)).hexdigest()
-#check_address = hashlib.sha256(binascii.unhexlify(check_address)).hexdigest()
 print("hash_pubkey ", check_address)
 
 
@@ -41,9 +40,21 @@ print("SIGNN ", signature.hex())
 print("Public ", public)
 
 tr = transaction.Transaction(0)
-tr.add_input("bd8cbb719bb27ba5d6cbb0501dab110033b677fdffa3bdc4b2952ba67a87caab", 1, signature.hex(), public)
+tr.add_input("486c887f2378feb1ea3cdc054cb7b6722e632ab1edac962a00723ea0240f2e9c", 1, signature.hex(), public)
 tr.add_output(50, check_address)
 
 serial = serializer.Serializer(tr)
 print(serial.get_serializer())
 print(serializer.Deserializer(serial.get_serializer()).get_deserializer())
+#TEST
+
+#cb = transaction.CoinbaseTransaction()
+#serial = serializer.Serializer(cb)
+#print(serial.get_serializer())
+
+
+
+
+
+
+

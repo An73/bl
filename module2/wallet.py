@@ -103,8 +103,8 @@ def sign(privkey, message):
 		singing_key = ecdsa.SigningKey.from_string(binascii.unhexlify(privkey), curve=ecdsa.SECP256k1, hashfunc=hashlib.sha256)
 	except:
 		return (-1, -1)
-	signature = singing_key.sign(message.encode('utf-8'), hashfunc=hashlib.sha256)
-	public = get_public_key(binascii.unhexlify(privkey))
+	signature = singing_key.sign(message.encode('utf-8'), hashfunc=hashlib.sha256, sigencode=ecdsa.util.sigencode_der)
+	public = public_to_compressed(get_public_key(binascii.unhexlify(privkey)))
 	return (signature, public)
 
 #print(get_address("123"))
