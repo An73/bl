@@ -10,7 +10,9 @@ class Input:
 		self.prev_index = prev_index
 		self.sequence = 4294967294
 		self.script_hex = hex(len(binascii.unhexlify(signature)) + 1)[2:] + signature + "01" + hex(len(binascii.unhexlify(pubkey)))[2:] + pubkey
-		#print("script_hex ", self.script_hex)
+		if self.script_hex[0 : 3] == "101":
+			self.script_hex = '0' + self.script_hex
+		print("script_hex ", self.script_hex)
 		self.length_script = len(binascii.unhexlify(self.script_hex))
 		
 	def set_sequense(sequense):
