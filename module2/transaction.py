@@ -48,6 +48,12 @@ class Transaction:
 	def get_output_counter(self):
 		return len(self.outputs)
 
+	def get_txid(self):
+		serial = Serializer(self).get_serializer()
+		txid = hashlib.sha256(binascii.unhexlify(serial)).hexdigest()
+		txid = hashlib.sha256(binascii.unhexlify(txid)).hexdigest()
+		return txid
+
 	#def set_locktime(self, locktime):
 	#	self.locktime = locktime
 	#def get_hash(self):

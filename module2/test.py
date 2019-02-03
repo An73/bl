@@ -42,6 +42,7 @@ print("Public ", public)
 tr = transaction.Transaction(0)
 tr.add_input("486c887f2378feb1ea3cdc054cb7b6722e632ab1edac962a00723ea0240f2e9c", 1, signature.hex(), public)
 tr.add_output(50, check_address)
+print("txid", tr.get_txid())
 
 serial = serializer.Serializer(tr)
 print(serial.get_serializer())
