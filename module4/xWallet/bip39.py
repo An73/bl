@@ -1,5 +1,9 @@
 import secrets
 import struct
+import binascii
+import hashlib
+import hmac
+from bitstring import BitArray
 
 
 def get_mnemonic():
@@ -35,9 +39,20 @@ def get_secrets_from_mnemonic(mnemonic):
 			else:
 				i += 1
 	#print(numb)
-	
-	return numb
+	bits = []
+	s = ''
+	for n in numb:
+		#print(n)
+		#bits.append(BitArray(hex=(struct.pack('>H', n)).hex()).bin[5:])
+		s += BitArray(hex=(struct.pack('>H', n)).hex()).bin[5:]
 
+	#print(BitArray(hex=(struct.pack('>H', numb[0])).hex()).bin)
+		
+	print(hashlib.sha256(BitArray(s)).hexdigest())
+	return int(s, 2)
+
+def get_master_node(entropy):
+	return hmac.new(bytes(entropy), msg='Bitcoin seed'.encode('utf-8'), digestmod=hashlib.sha512)
 
 
 
@@ -48,6 +63,7 @@ def get_secrets_from_mnemonic(mnemonic):
 #base64.b64encode(dig).decode()
 
 #print(get_mnemonic())
-print(get_secrets_from_mnemonic(['much', 'evoke', 'track', 'embody', 'sibling', 'celery', 'parrot', 'neck', 'bus', 'visual', 'acquire', 'fabric']))
-
+print(get_secrets_from_mnemonic(['salmon', 'evoke', 'track', 'embody', 'sibling', 'celery', 'parrot', 'neck', 'bus', 'visual', 'acquire', 'fabric']))
+print(get_master_node(1082763))
 #print(struct.unpack("<L", byte))
+4049639642424071766793045316491381082763
